@@ -5,7 +5,7 @@ pipeline {
     environment {
         IMAGE_NAME = "sarvnoorkaur/my-web-app"
         IMAGE_TAG = "latest"
-        KUBECONFIG = 'C:\Users\sarvn\.kube\\config'
+        KUBECONFIG = 'C:/Users/sarvn/.kube/config'
     }
 
     stages {
