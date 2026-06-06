@@ -18,7 +18,7 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                bat "docker build -t %IMAGE_NAME%:%IMAGE_TAG% ."
+                sh "docker build -t %IMAGE_NAME%:%IMAGE_TAG% ."
             }
         }
 
@@ -32,28 +32,28 @@ pipeline {
                     )
                 ]) {
 
-                    bat "docker login -u %USER% -p %PASS%"
+                    sh "docker login -u %USER% -p %PASS%"
                 }
             }
         }
 
         stage('Push Image') {
             steps {
-                bat "docker push %IMAGE_NAME%:%IMAGE_TAG%"
+                sh "docker push %IMAGE_NAME%:%IMAGE_TAG%"
             }
             
         }
 
         stage('Check Kubernetes') {
           steps {
-              bat 'kubectl config current-context'
-              bat 'kubectl get nodes'
+              sh 'kubectl config current-context'
+              sh 'kubectl get nodes'
           }
 }
 
         stage('Deploy To Kubernetes') {
             steps {
-                bat """
+                sh """
                 kubectl set image deployment/web-deployment ^
                 web-container=%IMAGE_NAME%:%IMAGE_TAG%
                 """
