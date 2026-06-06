@@ -4,7 +4,7 @@ pipeline {
 
     environment {
         IMAGE_NAME = "sarvnoorkaur/my-web-app"
-        IMAGE_TAG = "${my-web-app}"
+        IMAGE_TAG = "latest"
     }
 
     stages {
