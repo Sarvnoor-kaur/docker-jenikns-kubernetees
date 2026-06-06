@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: docker-jenknins-kuber-deployment
+
+spec:
+  replicas: 2
+
+  selector:
+    matchLabels:
+      app: web
+
+  template:
+    metadata:
+      labels:
+        app: web
+
+    spec:
+      containers:
+      - name: web-container
+        image: sarvnoorkaur/my-web-app:v1
+
+        ports:
+        - containerPort: 80
