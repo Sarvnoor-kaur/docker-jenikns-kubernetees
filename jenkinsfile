@@ -12,7 +12,7 @@ pipeline {
         stage('Checkout Source') {
             steps {
                 git branch: 'main',
-                url: 'https://github.com/Sarvnoor-kaur/docker-jenkins.git'
+                url: 'https://github.com/Sarvnoor-kaur/docker-jenkins-kubernetees.git'
             }
         }
 
@@ -27,8 +27,8 @@ pipeline {
                 withCredentials([
                     usernamePassword(
                         credentialsId: 'dockerhub',
-                        usernameVariable: 'USER',
-                        passwordVariable: 'PASS'
+                        usernameVariable: 'sarvnoorkaur',
+                        passwordVariable: 'Sarvnoor@2005'
                     )
                 ]) {
 
