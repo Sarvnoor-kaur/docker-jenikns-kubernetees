@@ -41,7 +41,15 @@ pipeline {
             steps {
                 bat "docker push %IMAGE_NAME%:%IMAGE_TAG%"
             }
+            
         }
+
+        stage('Check Kubernetes') {
+          steps {
+              bat 'kubectl config current-context'
+              bat 'kubectl get nodes'
+          }
+}
 
         stage('Deploy To Kubernetes') {
             steps {
