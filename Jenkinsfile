@@ -5,7 +5,9 @@ pipeline {
     environment {
         IMAGE_NAME = "sarvnoorkaur/my-web-app"
         IMAGE_TAG = "latest"
-        KUBECONFIG = 'C:/Users/sarvn/.kube/config'
+
+        // IMPORTANT: must exist inside Jenkins container
+        KUBECONFIG = "/root/.kube/config"
     }
 
     stages {
@@ -45,18 +47,33 @@ pipeline {
 
         stage('Check Kubernetes') {
             steps {
-                sh 'kubectl config current-context'
-                sh 'kubectl get nodes'
+                sh '''
+                    echo "Checking Kubernetes connection..."
+                    kubectl --kubeconfig=$KUBECONFIG get nodes
+                '''
             }
         }
 
         stage('Deploy To Kubernetes') {
             steps {
-                sh """
-                kubectl set image deployment/web-deployment \
-                web-container=${IMAGE_NAME}:${IMAGE_TAG}
-                """
+                sh '''
+                    echo "Updating Kubernetes deployment image..."
+
+                    kubectl --kubeconfig=$KUBECONFIG set image deployment/web-deployment \
+                    web-container=${IMAGE_NAME}:${IMAGE_TAG}
+
+                    kubectl --kubeconfig=$KUBECONFIG rollout status deployment/web-deployment
+                '''
             }
+        }
+    }
+
+    post {
+        success {
+            echo "✅ Pipeline completed successfully!"
+        }
+        failure {
+            echo "❌ Pipeline failed. Check logs."
         }
     }
 }
