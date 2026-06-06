@@ -27,8 +27,8 @@ pipeline {
                 withCredentials([
                     usernamePassword(
                         credentialsId: 'dockerhub',
-                        usernameVariable: 'sarvnoorkaur',
-                        passwordVariable: 'Sarvnoor@2005'
+                        usernameVariable: 'USER',
+                        passwordVariable: 'PASS'
                     )
                 ]) {
 
@@ -45,7 +45,6 @@ pipeline {
 
         stage('Deploy To Kubernetes') {
             steps {
-
                 bat """
                 kubectl set image deployment/web-deployment ^
                 web-container=%IMAGE_NAME%:%IMAGE_TAG%
