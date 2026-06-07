@@ -5,7 +5,7 @@ pipeline {
         IMAGE_NAME = "sarvnoorkaur/my-web-app"
         IMAGE_TAG = "latest"
 
-        // 🔥 IMPORTANT FIX: Jenkins must know kubeconfig globally
+        // Kubernetes config (Windows Jenkins fix)
         KUBECONFIG = "C:\\ProgramData\\Jenkins\\.kube\\config"
     }
 
@@ -44,23 +44,28 @@ pipeline {
             }
         }
 
-        stage('Check Kubernetes') {
+        stage('Deploy To Kubernetes') {
             steps {
                 bat """
                     echo Using kubeconfig: %KUBECONFIG%
-                    kubectl get nodes
+
+                    REM 🔥 FIRST: Create/Update deployment and service
+                    kubectl apply -f deployment.yaml
+                    kubectl apply -f service.yaml
+
+                    REM 🔥 THEN: Update image
+                    kubectl set image deployment/web-deployment ^
+                    web-container=%IMAGE_NAME%:%IMAGE_TAG%
+
+                    REM 🔥 WAIT FOR ROLLOUT
+                    kubectl rollout status deployment/web-deployment
                 """
             }
         }
 
-        stage('Deploy To Kubernetes') {
+        stage('Check Kubernetes') {
             steps {
-                bat """
-                    kubectl set image deployment/web-deployment ^
-                    web-container=%IMAGE_NAME%:%IMAGE_TAG%
-
-                    kubectl rollout status deployment/web-deployment
-                """
+                bat "kubectl get nodes"
             }
         }
     }
