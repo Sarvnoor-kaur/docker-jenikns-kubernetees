@@ -1,13 +1,9 @@
 pipeline {
-
     agent any
 
     environment {
         IMAGE_NAME = "sarvnoorkaur/my-web-app"
         IMAGE_TAG = "latest"
-
-        // IMPORTANT: must exist inside Jenkins container
-        KUBECONFIG = "/root/.kube/config"
     }
 
     stages {
@@ -21,7 +17,7 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                sh "docker build -t ${IMAGE_NAME}:${IMAGE_TAG} ."
+                bat "docker build -t %IMAGE_NAME%:%IMAGE_TAG% ."
             }
         }
 
@@ -32,38 +28,33 @@ pipeline {
                     usernameVariable: 'USER',
                     passwordVariable: 'PASS'
                 )]) {
-                    sh '''
-                        echo "$PASS" | docker login -u "$USER" --password-stdin
-                    '''
+                    bat """
+                        echo %PASS% | docker login -u %USER% --password-stdin
+                    """
                 }
             }
         }
 
         stage('Push Image') {
             steps {
-                sh "docker push ${IMAGE_NAME}:${IMAGE_TAG}"
+                bat "docker push %IMAGE_NAME%:%IMAGE_TAG%"
             }
         }
 
         stage('Check Kubernetes') {
             steps {
-                sh '''
-                    echo "Checking Kubernetes connection..."
-                    kubectl --kubeconfig=$KUBECONFIG get nodes
-                '''
+                bat "kubectl get nodes"
             }
         }
 
         stage('Deploy To Kubernetes') {
             steps {
-                sh '''
-                    echo "Updating Kubernetes deployment image..."
+                bat """
+                    kubectl set image deployment/web-deployment ^
+                    web-container=%IMAGE_NAME%:%IMAGE_TAG%
 
-                    kubectl --kubeconfig=$KUBECONFIG set image deployment/web-deployment \
-                    web-container=${IMAGE_NAME}:${IMAGE_TAG}
-
-                    kubectl --kubeconfig=$KUBECONFIG rollout status deployment/web-deployment
-                '''
+                    kubectl rollout status deployment/web-deployment
+                """
             }
         }
     }
