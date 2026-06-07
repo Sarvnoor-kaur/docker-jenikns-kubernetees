@@ -4,6 +4,9 @@ pipeline {
     environment {
         IMAGE_NAME = "sarvnoorkaur/my-web-app"
         IMAGE_TAG = "latest"
+
+        // 🔥 IMPORTANT FIX: Jenkins must know kubeconfig globally
+        KUBECONFIG = "C:\\ProgramData\\Jenkins\\.kube\\config"
     }
 
     stages {
@@ -43,7 +46,10 @@ pipeline {
 
         stage('Check Kubernetes') {
             steps {
-                bat "kubectl get nodes"
+                bat """
+                    echo Using kubeconfig: %KUBECONFIG%
+                    kubectl get nodes
+                """
             }
         }
 
