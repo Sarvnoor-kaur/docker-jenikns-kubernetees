@@ -49,16 +49,16 @@ pipeline {
                 bat """
                     echo Using kubeconfig: %KUBECONFIG%
 
-                    REM 🔥 FIRST: Create/Update deployment and service
+                    REM 🔥 Apply deployment and service
                     kubectl apply -f deployment.yaml
                     kubectl apply -f service.yaml
 
-                    REM 🔥 THEN: Update image
-                    kubectl set image deployment/web-deployment ^
+                    REM 🔥 FIXED: use correct deployment name from YAML
+                    kubectl set image deployment/docker-jenknins-kuber-deployment ^
                     web-container=%IMAGE_NAME%:%IMAGE_TAG%
 
                     REM 🔥 WAIT FOR ROLLOUT
-                    kubectl rollout status deployment/web-deployment
+                    kubectl rollout status deployment/docker-jenknins-kuber-deployment
                 """
             }
         }
