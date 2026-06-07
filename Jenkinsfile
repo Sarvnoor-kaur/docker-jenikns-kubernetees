@@ -49,15 +49,36 @@ pipeline {
                 bat """
                     echo Using kubeconfig: %KUBECONFIG%
 
-                    REM 🔥 Apply deployment and service
+                    REM Apply deployment and service
                     kubectl apply -f deployment.yaml
                     kubectl apply -f service.yaml
 
-                    REM 🔥 FIXED: use correct deployment name from YAML
+                    REM Update image in deployment
                     kubectl set image deployment/docker-jenknins-kuber-deployment ^
                     web-container=%IMAGE_NAME%:%IMAGE_TAG%
 
-                    REM 🔥 WAIT FOR ROLLOUT
+                    REM Wait for rollout
+                    kubectl rollout status deployment/docker-jenknins-kuber-deployment
+                """
+            }
+        }
+
+        // 🔥 NEW STAGE ADDED HERE
+        stage('Verify Deployment') {
+            steps {
+                bat """
+                    echo ===== Checking Kubernetes Resources =====
+
+                    echo --- Deployments ---
+                    kubectl get deployments
+
+                    echo --- Pods ---
+                    kubectl get pods
+
+                    echo --- Services ---
+                    kubectl get svc
+
+                    echo --- Rollout Status ---
                     kubectl rollout status deployment/docker-jenknins-kuber-deployment
                 """
             }
